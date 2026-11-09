@@ -1,0 +1,23 @@
+{
+  "format": "sse-proxy/v1",
+  "name": "本地 SSE 示例",
+  "request": {
+    "method": "POST",
+    "url": "http://127.0.0.1:9101/stream"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "text/event-stream; charset=utf-8",
+      "cache-control": "no-cache"
+    }
+  },
+  "response_offset": 0.1,
+  "duration": 1.6,
+  "outcome": "completed",
+  "frames": [
+    { "offset": 0.2, "event": "message", "id": "1", "data": { "text": "Hello " } },
+    { "offset": 0.8, "event": "message", "id": "2", "data": { "text": "来自本地 JSON 👋" } },
+    { "offset": 1.6, "event": "done", "data": "[DONE]" }
+  ]
+}

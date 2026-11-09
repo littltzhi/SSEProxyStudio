@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="api-token" content="__API_TOKEN__">
+  <title>SSE Proxy Studio</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="brand"><span class="logo">S</span><div><h1>SSE Proxy Studio</h1><p>RECORD · INSPECT · REPLAY</p></div></div>
+    <div class="connection"><span id="connection-dot"></span><span id="connection">正在连接代理</span></div>
+    <button id="setup-button">连接说明</button>
+  </header>
+  <main>
+    <section class="controls">
+      <div class="mode-switch" role="group" aria-label="代理模式">
+        <button data-mode="off">透传</button><button data-mode="record">● 录制</button><button data-mode="replay">▶ 回放</button>
+      </div>
+      <span id="mode-description">流量经过代理，暂不录制</span>
+      <div class="grow"></div>
+      <label>速度 <select id="speed"><option value=".5">0.5×</option><option value="1">1× 原速</option><option value="2">2×</option><option value="4">4×</option><option value="0">即时</option></select></label>
+      <button id="new-button">＋ 新建 JSON</button><button id="import-button" class="primary">导入 JSON</button>
+      <input id="import-file" type="file" accept=".json,application/json" hidden>
+    </section>
+    <section class="scope">
+      <strong>录制范围</strong>
+      <label>Host <input id="host-filter" value="*" placeholder="*.example.com"></label>
+      <label>Path <input id="path-filter" value="*" placeholder="*/chat/stream*"></label>
+      <button id="scope-save">应用</button>
+      <span>支持 * 通配符，仅记录 text/event-stream</span>
+    </section>
+    <section id="replay-rule" class="rule">
+      <span>回放规则</span><strong id="selected-rule">尚未选用录制</strong>
+      <label><input type="checkbox" id="include-query">匹配 query</label>
+      <span id="hits">0 次命中</span>
+    </section>
+    <div id="notice" role="status" hidden></div>
+    <section class="workspace">
+      <aside class="history">
+        <div class="section-title"><h2>历史录制 <span id="record-count">0</span></h2><span class="muted">自动保存</span></div>
+        <input id="search" class="search" placeholder="搜索名称、域名或路径" aria-label="搜索录制">
+        <div id="recordings" class="recordings"></div>
+        <div class="history-footer">显示最近 500 条 · 重启后保留记录</div>
+      </aside>
+      <article class="detail">
+        <div id="empty" class="empty"><span class="empty-icon">↕</span><h2>让流式响应可复现</h2><p>连接代理并开启录制，或导入本地 JSON。<br>选择一条记录，查看事件、编辑并回放。</p><button id="empty-new">从示例开始</button></div>
+        <div id="detail-content" hidden>
+          <div class="detail-heading"><div><span class="eyebrow">RECORDING</span><h2 id="detail-name"></h2><p id="detail-url"></p></div><button id="use-button" class="primary">选为回放源</button></div>
+          <div id="metrics" class="metrics"></div>
+          <nav class="tabs" aria-label="详情视图"><button data-tab="events" class="active">事件时间线</button><button data-tab="json">JSON 编辑器</button><button data-tab="request">请求 / 响应</button><div class="grow"></div><button id="export-button">导出原始 JSON</button><button id="delete-button" class="danger">删除</button></nav>
+          <div id="events-panel" class="panel"></div>
+          <div id="json-panel" class="panel" hidden>
+            <div class="editor-toolbar"><span id="editor-caption">frames 为可编辑事件，chunks 为原始字节。两者任选其一。</span><button id="raw-button">载入原始字节 JSON</button><button id="save-button" class="primary">保存副本并选用</button></div>
+            <textarea id="editor" spellcheck="false" aria-label="录制 JSON 编辑器"></textarea>
+          </div>
+          <div id="request-panel" class="panel" hidden><pre id="request-details"></pre></div>
+        </div>
+      </article>
+    </section>
+    <footer><span>LOCAL FIRST · 数据保存在本机</span><span id="data-path"></span></footer>
+  </main>
+  <dialog id="setup">
+    <div class="dialog-heading"><h2>连接你的 App</h2><button id="setup-close" aria-label="关闭">×</button></div>
+    <ol>
+      <li><strong>HTTP 代理</strong><p>将客户端代理设置为 <code id="proxy-address">127.0.0.1:8088</code>。真机需通过 <code>--listen-host 0.0.0.0</code> 启动，并使用 Mac 的局域网 IP。</p></li>
+      <li><strong>HTTPS 证书</strong><p>客户端经代理打开 <code>http://mitm.it</code> 安装本工具的 CA，并在系统中信任。iOS 需在「设置 → 通用 → 关于本机 → 证书信任设置」开启信任。</p><button id="certificate-button">下载 CA 证书</button></li>
+      <li><strong>录制 / 回放</strong><p>开启录制后正常操作 App。选用历史或 JSON，再切换回放；命中的方法、协议、域名、端口和路径使用本地响应，其余请求正常转发。</p></li>
+    </ol>
+    <p class="muted">无需嵌入 SDK。不会自动修改系统代理或证书信任。证书锁定、自定义直连连接以及 HTTP/3 流量需要客户端额外配置。</p>
+  </dialog>
+</body>
+</html>
